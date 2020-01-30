@@ -1,0 +1,14 @@
+Conexões:
+O arduino deve estar conectado à placa corroída e esta deve ser encaixada à bancada de teste com a face contendo o decoder voltada para cima. O conector boca de jacaré (direita), ligado ao sensor de tensão, deve ser ligado ao terminal negativo do motor enqunto que o outro conector (esquerda) deve ser ligado ao terminal positivo do motor. A fonte de tensão deve ter a sua saída positiva ligada à ponta sem conector liga aos sensores de tensão e corrente. O terminal da fonte deve ser conectado ao ao terminal negativo do motor. O arduino deve estar conectado ao computador com o software de leitura de dados atravéx da conexão USB. Esta conexão será responsável pelo compartilhamento dos valores lidos pelo sistema de coleta de dados e a alimentação do mesmo.
+
+Teste:
+Todas as conexões descritas acima devem estar feitas corretamente e fonte de tensão CC deve estar ligada e com 0V na saída antes do teste iniciar. Iniciada a leitra dos dados, é pssivel variar a tensão da fonte para observar o comportamento do motor.
+
+Código:
+A leitura dos sinais analógicos é feita atravéz do Timer1 e os sinais digitais, por uma interrupção no pino digital do decoder.
+
+O Timer1 é responsável por coletar as amostras dos sensores de tensão e corrente e também fazer o envio dos dados para a porta serial. O periodo do Timer1 é definido por 100ms dividido pelo numero de amostras coletadas nesse tempo. A função callback é chamada ao final do periodo setado pelo timer. Essa função faz a leitura dos sinais analógicos e os converte to em suas respectivas grandezas. A primeira parte de calback realiza apenas a amostragem dos sensores. A segunda parte, é apenas chamada se o numero de amostras definidas já foi coletado. Essa parte calcula a média das medições, faz o envio dos dados para a porta serial e zera as variáveis acumuladoras dos sensores.
+
+A interrupção é tratada pela função pulso, cujo propósito é armazenar o tempo em que o sinal mudou de LOW para HIGH. Esses tempos são tratados dentro do loop. O tratamento feito consiste em ignorar interrupções ocorridas a menos de 50us da anterior e acumular os tempos entre os pulsos do sinal assim como o numero de pulsos realizados. 
+
+A função calibrate calcula e escreve na porta serial o valor da leitura analógica cuja corrente elétrica equivalente é 0A. Sua chamada é realizada apenas no setup antes da inicialização do Timer1.
